@@ -48,8 +48,6 @@ async function displayProduct() {
             let color = new Option(product.colors[i], product.colors[i]);
             colorChoice.options.add(color);
         }
-
-        addToCart();
     })
 
     .catch(function(error) {
@@ -71,30 +69,23 @@ addToCartBtn.addEventListener("click", () => {
 });
 
 // Activation du Local Storage
-function addToCart() {
+function addToCart() {          // Autre possibilité aurait été d'ajouté chaque entrée avec localStorage.setItem() ?
     
-    if (localStorage.getItem("cart")) {
+    let infosProduct = {
+        kanapId : productId,
+        kanapName : product.name,
+        kanapColor : colorChoice.value,
+        kanapQuantity : Number(colorQuantity.value),
+        kanapPrice : product.price,
+        kanapImage : product.imageUrl,
+        kanapAltImage : product.altTxt,
+        kanapDescription : product.description
+    };
 
-        let cart = localStorage.getItem("cart");
+    console.log(infosProduct);
 
-    } else {
+    let infosCart = JSON.stringify(infosProduct); // Converts a JavaScript value to a JavaScript Object Notation (JSON) string
+    localStorage.setItem("cart", infosCart);      // La syntaxe localStorage.setItem() permet de stocker une donnée (ici l'objet infosProduct qui réunis toutes les infos)
 
-        let infosProduct = {
-            kanapId : productId,
-            kanapName : product.name,
-            kanapColor : colorChoice.value,
-            kanapQuantity : Number(colorQuantity.value),
-            kanapPrice : product.price,
-            kanapImage : product.imageUrl,
-            kanapAltImage : product.altTxt,
-            kanapDescription : product.description
-        };
-
-        console.log(infosProduct);
-
-        let infosCart = JSON.stringify(infosProduct);
-        localStorage.setItem("cart", infosCart);
-
-        alert("le produit a été ajoutée au panier.");
-    }
+    alert(`Votre commande de ${colorQuantity.value} ${product.name} de couleur ${colorChoice.value} est ajoutée au panier`);
 }
