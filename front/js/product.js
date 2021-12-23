@@ -68,7 +68,7 @@ addToCartBtn.addEventListener("click", () => {
     }
 });
 
-// Activation du Local Storage
+// Activation du localStorage
 function addToCart() {          // Autre possibilité aurait été d'ajouté chaque entrée avec localStorage.setItem() ?
     
     let infosProduct = {
