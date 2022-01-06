@@ -160,3 +160,32 @@ function modifyProduct() {
 }
 
 modifyProduct();
+
+// Supression d'un produit du panier
+function deleteProduct() {
+    // On sélectionne tous les boutons Supprimer du panier
+    let deleteButtons = document.querySelectorAll(".deleteItem");
+
+    for (let l = 0; l < deleteButtons.length; l++) {
+        
+        deleteButtons[l].addEventListener("click", (e) => {
+
+            // Indentification du produit par son id
+            let deleteId = productCart[l].kanapId;
+            // Indentification du produit par sa couleur
+            let deleteColor = productCart[l].kanapColor;
+
+            //  Crée et retourne un nouveau tableau contenant tous les éléments du tableau d'origine qui remplissent une condition déterminée (ici tous sauf celui dont l'id et la couleur sont identifiés par l'action du click)
+            productCart = productCart.filter(elt => elt.kanapId !== deleteId || elt.kanapColor !== deleteColor);
+
+            // On actualise l'action effectuée dans le localStorage
+            localStorage.setItem("cart", JSON.stringify(productCart));
+            console.log("Ce produit a été retiré du panier");
+            alert("Ce produit a été retiré du panier");
+            location.reload();
+        })
+    }
+}
+
+deleteProduct();
+
