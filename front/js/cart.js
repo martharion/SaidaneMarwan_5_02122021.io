@@ -1,15 +1,16 @@
 // Récupération de l'objet via localStorage
 let productCart = JSON.parse(localStorage.getItem("cart"));
+console.log("Le localStorage contient actuellement les produits ci-dessous");
 console.table(productCart);
 
-// Affichage d'un message indiquant que le panier est vide
-const sectionCart = document.getElementById("cart__items");
-const emptyCart = document.createElement("p");
-emptyCart.innerHTML = "Votre panier est actuellement vide.";
+// Sélection de la balise Section du cart
+const sectionCart = document.querySelector("#cart__items");
 
 // Affichage des produits ajoutés au panier
 function displayCart() {
+
     if (productCart == 0 || productCart === null) {
+        const emptyCart = `<p>Votre panier est actuellement vide.</p>`;
         sectionCart.innerHTML = emptyCart;
     } else {
 
@@ -93,40 +94,69 @@ function displayCart() {
             productDelete.innerText = "Supprimer";
             productDivDelete.appendChild(productDelete);
         }
-
-        console.log(productCart);
-        console.table(productCart);
+        console.log("L'affichage des produits s'est bien passée");
     }
 }
 
 displayCart();
 
+// Affichage de la quantité des produits et du prix total
 function displayTotals() {
 
     // Affichage de la quantité total
     let inputQuantity = document.getElementsByClassName("itemQuantity");
     let totalLength = inputQuantity.length;
-    let totalQuantity = 0
+    let totalQuantity = 0;
 
-    for (let i = 0; i < totalLength; i++) {
-        totalQuantity += inputQuantity[i].valueAsNumber;
+    for (let j = 0; j < totalLength; ++j) {
+        totalQuantity += inputQuantity[j].valueAsNumber;
     }
 
     let displayQuantity = document.getElementById("totalQuantity");
     displayQuantity.innerHTML = totalQuantity;
+    console.log("Ci-dessous se trouve la quantité totale des produits");
     console.log(totalQuantity);
 
     // Affichage du prix total
     let totalPrice = 0;
 
-    for (let i = 0; i < totalLength; i++) {
-        totalPrice += (inputQuantity[i].valueAsNumber * productCart[i].kanapPrice);
+    for (let j = 0; j < totalLength; ++j) {
+        totalPrice += (inputQuantity[j].valueAsNumber * productCart[j].kanapPrice);
     }
 
     let displayPrice = document.getElementById("totalPrice");
     displayPrice.innerHTML = totalPrice;
+    console.log("Ci-dessous se trouve le prix total de tous les produits");
     console.log(totalPrice);
 }
 
 displayTotals();
 
+// Modification de la quantité d'un produit
+function modifyProduct() {
+    // On sélectionne tous les inputs de quantité des produits affichés
+    let modifyInputQty = document.querySelectorAll(".itemQuantity");
+
+    for (let k = 0; k < modifyInputQty.length; k++) {
+        
+        modifyInputQty[k].addEventListener("change", (e) => {
+
+            // le nombre d'exemplaire du produit commandé sur la page product
+            let quantityOrdered = productCart[k].kanapQuantity;
+            // le nouveau nombre d'exemplaire désiré sur la page cart
+            let quantityModified = modifyInputQty[k].valueAsNumber;
+
+            // Renvoie la valeur du premier élément trouvé dans le tableau qui respecte la condition donnée par la fonction de test passée en argument
+            let findResult = productCart.find(elt => elt.quantityModified !== quantityOrdered);
+
+            findResult.kanapQuantity = quantityModified;
+            productCart[k].kanapQuantity = findResult.kanapQuantity;
+
+            // On actualise l'action effectuée dans le localStorage
+            localStorage.setItem("cart", JSON.stringify(productCart));
+            location.reload();
+        });  
+    }
+}
+
+modifyProduct();
