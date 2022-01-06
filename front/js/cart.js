@@ -276,3 +276,62 @@ function formRegExp() {
 
 formRegExp();
 
+// Envoi de toutes les informations au localStorage
+function formPost() {
+    let orderButton = document.getElementById("order");
+
+    orderButton.addEventListener("click", (e) => {
+
+        // Récupération des données du formulaire
+        let inputFirstName = document.getElementById('firstName');
+        let inputLastName = document.getElementById('lastName');
+        let inputAdress = document.getElementById('address');
+        let inputCity = document.getElementById('city');
+        let inputEmail = document.getElementById('email');
+
+        // Création d'un nouvel array dans le localStorage
+        let productsId = [];
+
+        for (let m = 0; m < productCart.length; m++) {
+            productsId.push(productCart[m].kanapId);
+        }
+        console.log(productsId);
+
+        // Réunion des données a envoyé
+        const order = {
+            contact : {
+                firstName: inputFirstName.value,
+                lastName: inputLastName.value,
+                address: inputAdress.value,
+                city: inputCity.value,
+                email: inputEmail.value,
+            },
+            products : productsId,
+        }
+
+        const postInfos = {
+            method: 'POST',
+            body: JSON.stringify(order),
+            headers: {
+                "Accept": "application/json", 
+                "Content-Type": "application/json"
+            }
+        };
+
+        fetch("http://localhost:3000/api/products/order", postInfos)
+
+        .then((response) => response.json())
+
+        .then((data) => {
+            console.log(data);
+            localStorage.setItem("orderId", data.orderId);
+            document.location.href = "confirmation.html";
+        })
+
+        .catch((error) => {
+            alert ("Problème rencontré avec fetch : " + error.message);
+        });
+    })
+}
+
+formPost();
