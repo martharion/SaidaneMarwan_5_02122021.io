@@ -2,7 +2,6 @@
 var str = window.location.href;
 var url = new URL(str);
 var productId = url.searchParams.get("id");
-console.log(productId);
 
 // Initialisation de variables et constantes globals
 var product = "";
@@ -12,8 +11,8 @@ const colorQuantity = document.getElementById("quantity");
 // Récupération du produit de l'API
 async function getProduct() {
     let fetchProduct = await fetch("http://localhost:3000/api/products/" + productId)
-    console.log(typeof fetchProduct)
-    console.log("la récupération s'est bien passé")
+    console.log("La récupération de l'id s'est bien passée");
+    console.log(productId);
     return fetchProduct.json();
 }
 
@@ -23,6 +22,7 @@ async function displayProduct() {
 
     .then(function(resultFetch) {
         product = resultFetch;
+        console.log("Les informations de ce produit récupérées dans l'API");
         console.table(resultFetch);
 
         // Insertion de l'élément "img"
@@ -68,10 +68,12 @@ addToCartBtn.addEventListener("click", () => {
     }
 });
 
-// Activation du localStorage
-function addToCart() {          // Autre possibilité aurait été d'ajouté chaque entrée avec localStorage.setItem() ?
+// Ajout d'un produit dans le panier
+function addToCart() {
     
-    let infosProduct = {
+    let colorSelected = colorChoice.value;
+    let quantitySelected = colorQuantity.value;
+    let productInfos = {
         kanapId : productId,
         kanapName : product.name,
         kanapColor : colorChoice.value,
@@ -82,10 +84,45 @@ function addToCart() {          // Autre possibilité aurait été d'ajouté cha
         kanapDescription : product.description
     };
 
-    console.log(infosProduct);
+    // Initialisation du localStorage
+    let cartLocalStorage = JSON.parse(localStorage.getItem("cart"));
 
-    let infosCart = JSON.stringify(infosProduct); // Converts a JavaScript value to a JavaScript Object Notation (JSON) string
-    localStorage.setItem("cart", infosCart);      // La syntaxe localStorage.setItem() permet de stocker une donnée (ici l'objet infosProduct qui réunis toutes les infos)
+    // Le panier contient déja au moins un produit
+    if (cartLocalStorage) {
+        // Renvoie la valeur du premier élément trouvé dans le tableau qui respecte la condition donnée par la fonction de test passée en argument
+        const findResult = cartLocalStorage.find(elt => elt.kanapId === productId && elt.kanapColor === colorSelected);
+        console.log("findResult indique ci-dessous si ce produit est déja présent dans le panier pour cette couleur")
+        console.log(findResult);
 
-    alert(`Votre commande de ${colorQuantity.value} ${product.name} de couleur ${colorChoice.value} est ajoutée au panier`);
+        // Le produit est déja présent dans le panier (même id et couleur)
+        if (findResult) {
+            // Analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée
+            let newQuantity = parseInt(productInfos.kanapQuantity) + parseInt(findResult.kanapQuantity);
+            findResult.kanapQuantity = newQuantity;
+            localStorage.setItem("cart", JSON.stringify(cartLocalStorage));
+            console.log("Message 1 : l'incrémentation d'un produit déja présent s'est bien passé");
+            console.log("Le localStorage contient actuellement les produits ci-dessous");
+            console.table(cartLocalStorage);
+            alert(`Votre commande de ${quantitySelected} ${product.name} de couleur ${colorSelected} est ajoutée au panier`);
+        
+        // Le produit n'est pas présent dans le panier
+        } else {
+            cartLocalStorage.push(productInfos);
+            localStorage.setItem("cart", JSON.stringify(cartLocalStorage));
+            console.log("Message 2 : l'ajout d'un nouveau produit s'est bien passé");
+            console.log("Le localStorage contient actuellement les produits ci-dessous");
+            console.table(cartLocalStorage);
+            alert(`Votre commande de ${quantitySelected} ${product.name} de couleur ${colorSelected} est ajoutée au panier`);
+        }
+    
+    // Le panier ne contient aucun produit
+    } else {
+        cartLocalStorage = [];
+        cartLocalStorage.push(productInfos);
+        localStorage.setItem("cart", JSON.stringify(cartLocalStorage));
+        console.log("Message 3 : le localStorage ne contenait aucun produit avant cet ajout");
+        console.log("Le localStorage contient actuellement les produits ci-dessous");
+        console.table(cartLocalStorage);
+        alert(`Votre commande de ${quantitySelected} ${product.name} de couleur ${colorSelected} est ajoutée au panier`);
+    }
 }
