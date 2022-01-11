@@ -3,11 +3,11 @@ let productCart = JSON.parse(localStorage.getItem("cart"));
 console.log("Le localStorage contient actuellement les produits ci-dessous");
 console.table(productCart);
 
-// Sélection de la balise Section du cart
-const sectionCart = document.querySelector("#cart__items");
-
 // Affichage des produits ajoutés au panier
 function displayCart() {
+
+    // Sélection de la balise Section du cart
+    const sectionCart = document.getElementById("cart__items");
 
     if (productCart == 0 || productCart === null) {
         const emptyCart = `<p>Votre panier est actuellement vide.</p>`;
@@ -56,7 +56,7 @@ function displayCart() {
 
             // Insertion de l'élément "p" (prix)
             let productPrice = document.createElement("p");
-            productPrice.innerHTML = productCart[i].kanapQuantity;
+            productPrice.innerHTML = productCart[i].kanapPrice + " €";
             productDivDescription.appendChild(productPrice);
 
             // Insertion de l'élément "div" (settings)
@@ -82,6 +82,7 @@ function displayCart() {
             productQuantity.setAttribute("min", "1");
             productQuantity.setAttribute("max", "100");
             productDivQuantity.appendChild(productQuantity);
+            productQuantity.value = productCart[i].kanapQuantity;
 
             // Insertion de l'élément "div" (delete)
             let productDivDelete = document.createElement("div");
@@ -97,8 +98,6 @@ function displayCart() {
         console.log("L'affichage des produits s'est bien passée");
     }
 }
-
-displayCart();
 
 // Affichage de la quantité des produits et du prix total
 function displayTotals() {
@@ -130,27 +129,20 @@ function displayTotals() {
     console.log(totalPrice);
 }
 
-displayTotals();
-
 // Modification de la quantité d'un produit
 function modifyProduct() {
     // On sélectionne tous les inputs de quantité des produits affichés
-    let modifyInputQty = document.querySelectorAll(".itemQuantity");
+    let quantityOrdered = document.querySelectorAll(".itemQuantity");
 
-    for (let k = 0; k < modifyInputQty.length; k++) {
+    for (let k = 0; k < quantityOrdered.length; k++) {
         
-        modifyInputQty[k].addEventListener("change", (e) => {
+        quantityOrdered[k].addEventListener("change", (e) => {
 
-            // le nombre d'exemplaire du produit commandé sur la page product
-            let quantityOrdered = productCart[k].kanapQuantity;
-            // le nouveau nombre d'exemplaire désiré sur la page cart
-            let quantityModified = modifyInputQty[k].valueAsNumber;
+            let quantityModified = quantityOrdered[k].valueAsNumber;
+            let newQuantity = productCart[k];
 
-            // Renvoie la valeur du premier élément trouvé dans le tableau qui respecte la condition donnée par la fonction de test passée en argument
-            let findResult = productCart.find(elt => elt.quantityModified !== quantityOrdered);
-
-            findResult.kanapQuantity = quantityModified;
-            productCart[k].kanapQuantity = findResult.kanapQuantity;
+            newQuantity.kanapQuantity = quantityModified;
+            productCart[k].kanapQuantity = newQuantity.kanapQuantity;
 
             // On actualise l'action effectuée dans le localStorage
             localStorage.setItem("cart", JSON.stringify(productCart));
@@ -158,8 +150,6 @@ function modifyProduct() {
         });  
     }
 }
-
-modifyProduct();
 
 // Supression d'un produit du panier
 function deleteProduct() {
@@ -186,8 +176,6 @@ function deleteProduct() {
         })
     }
 }
-
-deleteProduct();
 
 // Vérification des données via des regex
 function formRegExp() {
@@ -274,8 +262,6 @@ function formRegExp() {
     };
 }
 
-formRegExp();
-
 // Envoi de toutes les informations au localStorage
 function formPost() {
     let orderButton = document.getElementById("order");
@@ -324,8 +310,7 @@ function formPost() {
 
         .then((data) => {
             console.log(data);
-            localStorage.setItem("orderId", data.orderId);
-            document.location.href = "confirmation.html";
+            document.location.href = "confirmation.html?orderId=" + data.orderId;
         })
 
         .catch((error) => {
@@ -334,4 +319,11 @@ function formPost() {
     })
 }
 
-formPost();
+window.onload = function() { 
+    displayCart();
+    displayTotals();
+    modifyProduct();
+    deleteProduct();
+    formRegExp();
+    formPost();
+};
